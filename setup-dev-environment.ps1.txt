@@ -94,7 +94,7 @@ if (Download-File -Url $chromeUrl -OutputFile $chromeInstaller) {
 
 # 4. WinMerge のインストール
 Show-Progress -Status "WinMerge をダウンロード中..." -PercentComplete 70
-$winMergeUrl = "https://github.com/WinMerge/winmerge/releases/download/v2.16.30/WinMerge-2.16.-Setup.exe"
+$winMergeUrl = "https://github.com/WinMerge/winmerge/releases/download/v2.16.46/WinMerge-2.16.46-Setup.exe"
 $winMergeInstaller = "$tempFolder\WinMerge-Installer.exe"
 if (Download-File -Url $winMergeUrl -OutputFile $winMergeInstaller) {
     Show-Progress -Status "WinMerge をインストール中..." -PercentComplete 80
