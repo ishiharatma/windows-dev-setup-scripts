@@ -107,7 +107,7 @@ $vscodeUrl = "https://code.visualstudio.com/sha/download?build=stable&os=win32-x
 $vscodeInstaller = "$tempFolder\VSCode-Installer.exe"
 if (Download-File -Url $vscodeUrl -OutputFile $vscodeInstaller) {
     Show-Progress -Status "VSCode をインストール中..." -PercentComplete 95
-    Install-Software -InstallerPath $vscodeInstaller -Arguments "/VERYSILENT /NORESTART /MERGETASKS=!runcode"
+    Install-Software -InstallerPath $vscodeInstaller -Arguments "/VERYSILENT /NORESTART /MERGETASKS=!runcode,addcontextmenufiles,addcontextmenufolders,associatewithfiles,addtopath"
 }
 
 # 6. サクラエディタのインストール
