@@ -1,30 +1,30 @@
 # Usage: 
 # Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
-# 管理者権限で実行されているか確認
+# Check if running with administrator privileges
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "管理者権限で実行してください。スクリプトを終了します..."
+    Write-Warning "Please run with administrator privileges. Exiting the script..."
     Break
 }
 
-# 一時フォルダを作成
+# Create a temporary folder
 $tempFolder = "C:\Temp\SoftwareInstall"
 if (-not (Test-Path -Path $tempFolder)) {
     New-Item -ItemType Directory -Path $tempFolder | Out-Null
-    Write-Output "一時フォルダを作成しました: $tempFolder"
+    Write-Output "Temporary folder created: $tempFolder"
 }
 Set-Location $tempFolder
 
-# スクリプトの現在の進行状況を表示する関数
+# Function to display the current progress of the script
 function Show-Progress {
     param (
         [string]$Status,
         [int]$PercentComplete
     )
-    Write-Progress -Activity "PCセットアップ" -Status $Status -PercentComplete $PercentComplete
+    Write-Progress -Activity "PC Setup" -Status $Status -PercentComplete $PercentComplete
 }
 
-# ダウンロード関数
+# Download function
 function Download-File {
     param (
         [string]$Url,
@@ -33,16 +33,16 @@ function Download-File {
     try {
         $webClient = New-Object System.Net.WebClient
         $webClient.DownloadFile($Url, $OutputFile)
-        Write-Output "ダウンロード完了: $OutputFile"
+        Write-Output "Download complete: $OutputFile"
         return $true
     }
     catch {
-        Write-Error "ダウンロード失敗: $Url`nエラー: $_"
+        Write-Error "Download failed: $Url`nError: $_"
         return $false
     }
 }
 
-# インストール関数
+# Installation function
 function Install-Software {
     param (
         [string]$InstallerPath,
@@ -50,120 +50,121 @@ function Install-Software {
     )
     try {
         Start-Process -FilePath $InstallerPath -ArgumentList $Arguments -Wait
-        Write-Output "インストール完了: $InstallerPath"
+        Write-Output "Installation complete: $InstallerPath"
         return $true
     }
     catch {
-        Write-Error "インストール失敗: $InstallerPath`nエラー: $_"
+        Write-Error "Installation failed: $InstallerPath`nError: $_"
         return $false
     }
 }
 
-# toolsフォルダを作成（ZIPファイル展開用）
+# Create a tools folder (for extracting ZIP files)
 $toolsFolder = "C:\tools"
 if (-not (Test-Path -Path $toolsFolder)) {
     New-Item -ItemType Directory -Path $toolsFolder | Out-Null
-    Write-Output "toolsフォルダを作成しました: $toolsFolder"
+    Write-Output "Tools folder created: $toolsFolder"
 }
-# 1. Git のインストール
-Show-Progress -Status "Git をダウンロード中..." -PercentComplete 10
+
+# 1. Install Git
+Show-Progress -Status "Downloading Git..." -PercentComplete 10
 $gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
 $gitInstaller = "$tempFolder\Git-Installer.exe"
 if (Download-File -Url $gitUrl -OutputFile $gitInstaller) {
-    Show-Progress -Status "Git をインストール中..." -PercentComplete 20
+    Show-Progress -Status "Installing Git..." -PercentComplete 20
     Install-Software -InstallerPath $gitInstaller -Arguments "/VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS"
 }
 
-# 2. TortoiseGit のインストール
-Show-Progress -Status "TortoiseGit をダウンロード中..." -PercentComplete 30
+# 2. Install TortoiseGit
+Show-Progress -Status "Downloading TortoiseGit..." -PercentComplete 30
 $tortoiseGitUrl = "https://download.tortoisegit.org/tgit/2.17.0.0/TortoiseGit-2.17.0.2-64bit.msi"
 $tortoiseGitInstaller = "$tempFolder\TortoiseGit-Installer.msi"
 if (Download-File -Url $tortoiseGitUrl -OutputFile $tortoiseGitInstaller) {
-    Show-Progress -Status "TortoiseGit をインストール中..." -PercentComplete 40
+    Show-Progress -Status "Installing TortoiseGit..." -PercentComplete 40
     Install-Software -InstallerPath "msiexec.exe" -Arguments "/i `"$tortoiseGitInstaller`" /qn /norestart"
 }
 
-# 3. Chrome のインストール
-Show-Progress -Status "Chrome をダウンロード中..." -PercentComplete 50
+# 3. Install Chrome
+Show-Progress -Status "Downloading Chrome..." -PercentComplete 50
 $chromeUrl = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
 $chromeInstaller = "$tempFolder\ChromeInstaller.exe"
 if (Download-File -Url $chromeUrl -OutputFile $chromeInstaller) {
-    Show-Progress -Status "Chrome をインストール中..." -PercentComplete 60
+    Show-Progress -Status "Installing Chrome..." -PercentComplete 60
     Install-Software -InstallerPath $chromeInstaller -Arguments "/silent /install"
 }
 
-# 4. WinMerge のインストール
-Show-Progress -Status "WinMerge をダウンロード中..." -PercentComplete 70
+# 4. Install WinMerge
+Show-Progress -Status "Downloading WinMerge..." -PercentComplete 70
 $winMergeUrl = "https://github.com/WinMerge/winmerge/releases/download/v2.16.46/WinMerge-2.16.46-Setup.exe"
 $winMergeInstaller = "$tempFolder\WinMerge-Installer.exe"
 if (Download-File -Url $winMergeUrl -OutputFile $winMergeInstaller) {
-    Show-Progress -Status "WinMerge をインストール中..." -PercentComplete 80
+    Show-Progress -Status "Installing WinMerge..." -PercentComplete 80
     Install-Software -InstallerPath $winMergeInstaller -Arguments "/VERYSILENT /NORESTART"
 }
 
-# 5. VSCode のインストール
-Show-Progress -Status "VSCode をダウンロード中..." -PercentComplete 90
+# 5. Install VSCode
+Show-Progress -Status "Downloading VSCode..." -PercentComplete 90
 $vscodeUrl = "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64"
 $vscodeInstaller = "$tempFolder\VSCode-Installer.exe"
 if (Download-File -Url $vscodeUrl -OutputFile $vscodeInstaller) {
-    Show-Progress -Status "VSCode をインストール中..." -PercentComplete 95
+    Show-Progress -Status "Installing VSCode..." -PercentComplete 95
     Install-Software -InstallerPath $vscodeInstaller -Arguments "/VERYSILENT /NORESTART /MERGETASKS=!runcode,addcontextmenufiles,addcontextmenufolders,associatewithfiles,addtopath"
 }
 
-# 6. サクラエディタのインストール
-Show-Progress -Status "サクラエディタをダウンロード中..." -PercentComplete 90
+# 6. Install Sakura Editor
+Show-Progress -Status "Downloading Sakura Editor..." -PercentComplete 90
 $sakuraUrl = "https://github.com/sakura-editor/sakura/releases/download/v2.4.2/sakura-tag-v2.4.2-build4203-a3e63915b-Win32-Release-Installer.zip"
 $sakuraZip = "$tempFolder\SakuraEditor-Installer.zip"
 $sakuraExtractPath = "$tempFolder\SakuraEditor"
 
 if (Download-File -Url $sakuraUrl -OutputFile $sakuraZip) {
-    Show-Progress -Status "サクラエディタを解凍中..." -PercentComplete 92
+    Show-Progress -Status "Extracting Sakura Editor..." -PercentComplete 92
     
-    # 解凍用のディレクトリがなければ作成
+    # Create extraction directory if it doesn't exist
     if (-not (Test-Path -Path $sakuraExtractPath)) {
         New-Item -ItemType Directory -Path $sakuraExtractPath | Out-Null
     }
     
-    # zipファイルを展開
+    # Extract the zip file
     try {
         Expand-Archive -Path $sakuraZip -DestinationPath $sakuraExtractPath -Force
-        Write-Output "サクラエディタのZIPファイルを解凍しました"
+        Write-Output "Sakura Editor ZIP file extracted"
         
-        # インストーラーを探して実行
+        # Find and execute the installer
         $sakuraInstaller = Get-ChildItem -Path $sakuraExtractPath -Filter "*.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
         
         if ($sakuraInstaller) {
-            Show-Progress -Status "サクラエディタをインストール中..." -PercentComplete 95
+            Show-Progress -Status "Installing Sakura Editor..." -PercentComplete 95
             Install-Software -InstallerPath $sakuraInstaller -Arguments "/VERYSILENT /NORESTART"
         } else {
-            Write-Error "サクラエディタのインストーラーが見つかりませんでした"
+            Write-Error "Sakura Editor installer not found"
         }
     } catch {
-        Write-Error "サクラエディタの解凍またはインストール中にエラーが発生しました: $_"
+        Write-Error "Error occurred during extraction or installation of Sakura Editor: $_"
     }
 }
 
-# 7. Winshot のインストール
-Show-Progress -Status "Winshot をダウンロード中..." -PercentComplete 96
+# 7. Install Winshot
+Show-Progress -Status "Downloading Winshot..." -PercentComplete 96
 $winshotUrl = "https://www.woodybells.com/softs/ws153a.zip"
 $winshotZip = "$tempFolder\Winshot.zip"
 $winshotExtractPath = "C:\tools\Winshot"
 
 if (Download-File -Url $winshotUrl -OutputFile $winshotZip) {
-    Show-Progress -Status "Winshot を展開中..." -PercentComplete 98
+    Show-Progress -Status "Extracting Winshot..." -PercentComplete 98
     
-    # 展開先ディレクトリがなければ作成
+    # Create extraction directory if it doesn't exist
     if (-not (Test-Path -Path $winshotExtractPath)) {
         New-Item -ItemType Directory -Path $winshotExtractPath -Force | Out-Null
-        Write-Output "Winshot 用ディレクトリを作成しました: $winshotExtractPath"
+        Write-Output "Winshot directory created: $winshotExtractPath"
     }
     
-    # zipファイルを展開
+    # Extract the zip file
     try {
         Expand-Archive -Path $winshotZip -DestinationPath $winshotExtractPath -Force
-        Write-Output "Winshot のZIPファイルを展開しました: $winshotExtractPath"
+        Write-Output "Winshot ZIP file extracted: $winshotExtractPath"
         
-        # デスクトップにショートカットを作成 (オプション)
+        # Optionally create a desktop shortcut
         $desktopPath = [Environment]::GetFolderPath("Desktop")
         $winshotExe = Get-ChildItem -Path $winshotExtractPath -Filter "winshot.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
         
@@ -173,20 +174,19 @@ if (Download-File -Url $winshotUrl -OutputFile $winshotZip) {
             $shortcut = $shell.CreateShortcut($shortcutPath)
             $shortcut.TargetPath = $winshotExe
             $shortcut.Save()
-            Write-Output "Winshot のデスクトップショートカットを作成しました"
+            Write-Output "Winshot desktop shortcut created"
         } else {
-            Write-Warning "Winshot の実行ファイルが見つかりませんでした"
+            Write-Warning "Winshot executable not found"
         }
     } catch {
-        Write-Error "Winshot の展開中にエラーが発生しました: $_"
+        Write-Error "Error occurred during extraction of Winshot: $_"
     }
 }
 
-
-# 後片付け
-Show-Progress -Status "セットアップ完了" -PercentComplete 100
-Write-Output "全てのソフトウェアのインストールが完了しました。"
-Write-Output "一時ファイルをクリーンアップしています..."
-# 一時ファイルの削除をコメントアウトしておく（必要に応じて有効化）
+# Cleanup
+Show-Progress -Status "Setup Complete" -PercentComplete 100
+Write-Output "All software installations are complete."
+Write-Output "Cleaning up temporary files..."
+# Uncomment the following line to enable temporary file deletion
 # Remove-Item -Path $tempFolder -Recurse -Force
-Write-Output "セットアッププロセスが完了しました。"
+Write-Output "Setup process is complete."
