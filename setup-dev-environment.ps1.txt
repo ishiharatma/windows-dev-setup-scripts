@@ -1,3 +1,6 @@
+# Usage: 
+# Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+
 # 管理者権限で実行されているか確認
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Write-Warning "管理者権限で実行してください。スクリプトを終了します..."

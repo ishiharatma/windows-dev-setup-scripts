@@ -28,7 +28,7 @@ This script automatically downloads and installs the following software:
 2. Open PowerShell as Administrator
 3. Allow script execution by running:
    ```powershell
-   Set-ExecutionPolicy RemoteSigned -Scope Process
+   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
    ```
 4. Navigate to the directory containing the script
 5. Run the script:

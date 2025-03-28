@@ -28,7 +28,7 @@ Windows開発環境のセットアップを自動化するPowerShellスクリプ
 2. PowerShellを管理者として開きます
 3. 以下のコマンドを実行してスクリプト実行を許可します：
    ```powershell
-   Set-ExecutionPolicy RemoteSigned -Scope Process
+   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
    ```
 4. スクリプトが保存されているディレクトリに移動します
 5. スクリプトを実行します：
